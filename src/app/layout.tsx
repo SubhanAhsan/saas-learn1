@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import {Toaster} from "@/components/ui/sonner";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -30,7 +31,20 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-row mx-auto max-w-7xl ">
+        <header>
+          <nav></nav>
+        </header>
+
+        <main className="flex flex-col w-full mx-auto min-h-screen space-y-8 px-8 py-16">
+          {children}
+          <Toaster position={"top-center"} richColors />
+        </main>
+
+
+        <footer></footer>
+
+      </body>
     </html>
   );
 }
