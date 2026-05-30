@@ -8,9 +8,14 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {toast} from "sonner";
-import {signIn} from "@/lib/auth-client";
+import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {signInEmailAction} from "@/features/auth/actions/sign-in-email.action";
 
 export const LoginForm = () =>{
+
+    const router = useRouter();
+    const [isPending, setIsPending] = useState(false);
 
     const form = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
@@ -21,20 +26,38 @@ export const LoginForm = () =>{
     });
 
     async function onSubmit(form: LoginInput){
+        setIsPending(true);
 
-        await signIn.email({
-            email: form.email,
-            password: form.password,
-        },
-            {
-                onRequest: () => {},
-                onResponse: () => {},
-                onError: (ctx) => {
-                    toast.error(ctx.error.message);
-                },
-                onSuccess: () => {}
-            }
-        )
+        const {error} = await signInEmailAction(form);
+
+        if(error){
+            toast.error(error);
+            setIsPending(false);
+        } else{
+            toast.success("Login successful.");
+            router.push("/profile");
+        }
+
+        // await signIn.email({
+        //     email: form.email,
+        //     password: form.password,
+        // },
+        //     {
+        //         onRequest: () => {
+        //             setIsPending(true);
+        //         },
+        //         onResponse: () => {
+        //             setIsPending(false);
+        //         },
+        //         onError: (ctx) => {
+        //             toast.error(ctx.error.message);
+        //         },
+        //         onSuccess: () => {
+        //             toast.success("Login successful. Good to have you back");
+        //             router.push("/profile");
+        //         }
+        //     }
+        // )
     }
 
     return (
@@ -85,7 +108,7 @@ export const LoginForm = () =>{
                             )}
                         />
 
-                        <Button type="submit">Log In</Button>
+                        <Button type="submit" disabled={isPending}>Log In</Button>
 
                     </FieldGroup>
                 </form>

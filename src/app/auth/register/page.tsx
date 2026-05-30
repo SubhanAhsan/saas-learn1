@@ -1,16 +1,27 @@
 import {RegisterForm} from "@/features/auth/components/register-form";
+import {ReturnButton} from "@/components/shared/return-button";
+import Link from "next/link";
 
 export default function RegisterPage() {
     return (
-        <div>
-            <section className="container" >
-                <h1>Register Page</h1>
 
-                <article className="max-w-md mx-auto py-4 items-center justify-between">
-                    <RegisterForm />
-                </article>
+        <section className="container space-y-8">
+            <ReturnButton href={"/"} label={"Home"}/>
 
-            </section>
-        </div>
+            <h1 className={"text-3xl font-bold"}>Register Page</h1>
+
+            <article className="max-w-md mx-auto items-center justify-between">
+                <RegisterForm/>
+
+                <p className="text-muted-foreground text-sm">
+                    Already have an account?{" "}
+                    <Link href="/auth/login" className={"text-sm hover:text-foreground"}>
+                        Login
+                    </Link>
+                </p>
+            </article>
+
+        </section>
+
     )
 }

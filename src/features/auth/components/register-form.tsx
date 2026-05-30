@@ -3,15 +3,20 @@
 import {Controller, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {registerSchema, RegisterInput} from "@/features/auth/schemas/auth.schema";
-import {signUp} from "@/lib/auth-client";
 import {toast} from "sonner";
 import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {signUpEmailAction} from "@/features/auth/actions/sign-up-email.action";
 
 
 export const RegisterForm = () =>{
+
+    const router = useRouter();
+    const [isPending, setIsPending] = useState(false);
 
     const form = useForm<RegisterInput>({
         resolver: zodResolver(registerSchema),
@@ -23,20 +28,40 @@ export const RegisterForm = () =>{
     });
 
     async function onSubmit(form: RegisterInput){
-        await signUp.email({
-            name: form.name,
-            email: form.email,
-            password: form.password,
-        },
-            {
-                onRequest: () => {},
-                onResponse: () => {},
-                onError: (ctx) => {
-                  toast.error(ctx.error.message);
-                },
-                onSuccess: () => {},
-            }
-        )
+
+        setIsPending(true);
+
+        const {error} = await signUpEmailAction(form);
+
+        if(error){
+            toast.error(error);
+            setIsPending(false);
+        } else{
+            toast.success("Registration complete. You're all set.");
+            router.push("/auth/login");
+        }
+
+        // await signUp.email({
+        //     name: form.name,
+        //     email: form.email,
+        //     password: form.password,
+        // },
+        //     {
+        //         onRequest: () => {
+        //             setIsPending(true);
+        //         },
+        //         onResponse: () => {
+        //             setIsPending(false);
+        //         },
+        //         onError: (ctx) => {
+        //           toast.error(ctx.error.message);
+        //         },
+        //         onSuccess: () => {
+        //             toast.success("Registration complete. You're all set");
+        //             router.push("/profile");
+        //         },
+        //     }
+        // )
     }
 
     return (
@@ -105,7 +130,7 @@ export const RegisterForm = () =>{
                             )}
                         />
 
-                        <Button type="submit">Sign Up</Button>
+                        <Button type="submit" disabled={isPending}>Sign Up</Button>
 
                     </FieldGroup>
                 </form>
